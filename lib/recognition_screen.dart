@@ -1,14 +1,16 @@
+import 'dart:io';
+import 'dart:io' as io;
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
+
 import 'package:clipboard/clipboard.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
+
 import 'package:ocr_app/secrets.dart';
 import 'package:ocr_app/utils.dart';
-import 'dart:io' as io;
-import 'dart:io';
-import 'package:share_plus/share_plus.dart';
 
 class RecognitionScreen extends StatefulWidget {
   const RecognitionScreen({Key? key}) : super(key: key);
@@ -24,68 +26,70 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
   String scannedText = '';
 
   //function for showing dialog box for removing image
-  openDialogForRemove(BuildContext context) {
+  void openDialogForRemove(BuildContext context) {
     showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            children: [
-              SimpleDialogOption(
-                onPressed: () => removeImage(),
-                child: Text(
-                  'Remove image',
-                  style: textStyle(20, Colors.black, FontWeight.bold),
-                ),
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          children: [
+            SimpleDialogOption(
+              onPressed: () => removeImage(),
+              child: Text(
+                'Remove image',
+                style: textStyle(20, Colors.black, FontWeight.bold),
               ),
-              SimpleDialogOption(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'Cancel',
-                  style: textStyle(20, Colors.black, FontWeight.bold),
-                ),
-              )
-            ],
-          );
-        });
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: textStyle(20, Colors.black, FontWeight.bold),
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 
   //function for showing dialog box for image options
-  openDialogForUpload(BuildContext context) {
+  void openDialogForUpload(BuildContext context) {
     showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            children: [
-              SimpleDialogOption(
-                onPressed: () => pickImage(ImageSource.gallery),
-                child: Text(
-                  'Gallery',
-                  style: textStyle(20, Colors.black, FontWeight.bold),
-                ),
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          children: [
+            SimpleDialogOption(
+              onPressed: () => pickImage(ImageSource.gallery),
+              child: Text(
+                'Gallery',
+                style: textStyle(20, Colors.black, FontWeight.bold),
               ),
-              SimpleDialogOption(
-                onPressed: () => pickImage(ImageSource.camera),
-                child: Text(
-                  'Camera',
-                  style: textStyle(20, Colors.black, FontWeight.bold),
-                ),
+            ),
+            SimpleDialogOption(
+              onPressed: () => pickImage(ImageSource.camera),
+              child: Text(
+                'Camera',
+                style: textStyle(20, Colors.black, FontWeight.bold),
               ),
-              SimpleDialogOption(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'Cancel',
-                  style: textStyle(20, Colors.black, FontWeight.bold),
-                ),
-              )
-            ],
-          );
-        });
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: textStyle(20, Colors.black, FontWeight.bold),
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 
   //function for uploading the images from a device's source
-  pickImage(ImageSource source) async {
+  Future<void> pickImage(ImageSource source) async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: source);
     Navigator.pop(context);
@@ -94,7 +98,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
   }
 
   //function for scanning image
-  scanImage(File pickedImage) async {
+  Future<void> scanImage(File pickedImage) async {
     //updating UI to depict scanning is happening
     setState(() => scanning = true);
     //preparing the image i.e. converting it to base64 as that is what the api accepts
@@ -113,7 +117,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
     if (result['OCRExitCode'] == 1) {
       finalText = result['ParsedResults'][0]['ParsedText'];
     } else {
-      finalText = result['ErrorMessage'];
+      finalText = result['ErrorMessage'].toString();
     }
     //displaying final result in UI
     setState(() {
@@ -123,7 +127,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
   }
 
   //function for removing image
-  removeImage() {
+  void removeImage() {
     Navigator.pop(context);
     setState(() {
       pickedImage = null;
@@ -133,7 +137,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
   }
 
   //function for displaying the message "copied to clipboard"
-  displayCopyMessage() {
+  void displayCopyMessage() {
     SnackBar snackBar = SnackBar(
       content: Text(
         'Copied to clipboard',
@@ -145,7 +149,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
   }
 
   //function for sharing text
-  shareText() async {
+  Future<void> shareText() async {
     await Share.share(scannedText);
   }
 
@@ -161,8 +165,11 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
           //Copy button
           FloatingActionButton(
             heroTag: null,
-            onPressed: () =>
-                FlutterClipboard.copy(scannedText).then(displayCopyMessage()),
+            onPressed: () async {
+              await FlutterClipboard.copy(scannedText);
+              displayCopyMessage();
+              return;
+            },
             child: const Icon(
               Icons.copy,
               size: 28,
