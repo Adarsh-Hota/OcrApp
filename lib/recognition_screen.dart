@@ -189,76 +189,78 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
 
       //body
       body: SingleChildScrollView(
-          child: Container(
-        alignment: Alignment.center,
-        child: Column(
-          children: [
-            //Space
-            SizedBox(
-              height: 55 + MediaQuery.of(context).viewInsets.top,
-            ),
-
-            //Heading
-            Text(
-              'Text Recognition',
-              style: textStyle(30, Colors.blue, FontWeight.w800),
-            ),
-            const SizedBox(height: 30),
-
-            //Image
-            InkWell(
-              onTap: pickedImage == null
-                  ? null
-                  : () => openDialogForRemove(context),
-              child: Image(
-                width: 256,
-                height: 256,
-                image: pickedImage == null
-                    ? const AssetImage('assets/images/file_add.png')
-                    : FileImage(pickedImage!) as ImageProvider,
-                fit: BoxFit.fill,
+        child: Container(
+          alignment: Alignment.center,
+          child: Column(
+            children: [
+              //Space
+              SizedBox(
+                height: 55 + MediaQuery.of(context).viewInsets.top,
               ),
-            ),
 
-            //Space
-            const SizedBox(
-              height: 20,
-            ),
+              //Heading
+              Text(
+                'Text Recognition',
+                style: textStyle(30, Colors.blue, FontWeight.w800),
+              ),
+              const SizedBox(height: 30),
 
-            //Upload image button
-            ElevatedButton(
-                onPressed: (() => openDialogForUpload(context)),
-                child: Text('Upload image',
-                    style: textStyle(20, Colors.white, FontWeight.w700))),
+              //Image
+              InkWell(
+                onTap: pickedImage == null
+                    ? null
+                    : () => openDialogForRemove(context),
+                child: Image(
+                  width: 256,
+                  height: 256,
+                  image: pickedImage == null
+                      ? const AssetImage('assets/images/file_add.png')
+                      : FileImage(pickedImage!) as ImageProvider,
+                  fit: BoxFit.fill,
+                ),
+              ),
 
-            // Space
-            const SizedBox(
-              height: 10,
-            ),
+              //Space
+              const SizedBox(
+                height: 20,
+              ),
 
-            //Scan button
-            ElevatedButton(
-                onPressed:
-                    pickedImage == null ? null : () => scanImage(pickedImage!),
-                child: Text('Scan image',
-                    style: textStyle(20, Colors.white, FontWeight.w700))),
+              //Upload image button
+              ElevatedButton(
+                  onPressed: (() => openDialogForUpload(context)),
+                  child: Text('Upload image',
+                      style: textStyle(20, Colors.white, FontWeight.w700))),
 
-            //Space
-            const SizedBox(
-              height: 30,
-            ),
+              // Space
+              const SizedBox(
+                height: 10,
+              ),
 
-            //Scanned text
-            scanning == true
-                ? Text('Scanning...',
-                    style: textStyle(
-                        25, Colors.black.withOpacity(0.6), FontWeight.w600))
-                : Text(scannedText,
-                    style: textStyle(
-                        25, Colors.black.withOpacity(0.6), FontWeight.w600))
-          ],
+              //Scan button
+              ElevatedButton(
+                  onPressed: pickedImage == null
+                      ? null
+                      : () => scanImage(pickedImage!),
+                  child: Text('Scan image',
+                      style: textStyle(20, Colors.white, FontWeight.w700))),
+
+              //Space
+              const SizedBox(
+                height: 30,
+              ),
+
+              //Scanned text
+              scanning == true
+                  ? Text('Scanning...',
+                      style: textStyle(
+                          25, Colors.black.withOpacity(0.6), FontWeight.w600))
+                  : Text(scannedText,
+                      style: textStyle(
+                          25, Colors.black.withOpacity(0.6), FontWeight.w600))
+            ],
+          ),
         ),
-      )),
+      ),
     );
   }
 }
